@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة قلاع انتقام السلاطين</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 20px;
+        }
+        .container { max-width: 1000px; margin: 0 auto; }
+        h1 { text-align: center; color: #ffcc00; text-shadow: 0 2px 4px rgba(0,0,0,0.5); margin-bottom: 30px; }
+        
+        /* تصميم فوروم الإدخال */
+        .form-section {
+            background-color: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        .form-section h3 { color: #ffcc00; margin-top: 0; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { margin-bottom: 5px; font-size: 14px; color: #aaa; }
+        .form-group input { background-color: #2a2a2a; border: 1px solid #444; color: #fff; padding: 10px; border-radius: 4px; font-size: 15px; outline: none; }
+        .form-group input:focus { border-color: #ffcc00; }
+        .btn-submit { background-color: #ffcc00; color: #121212; border: none; padding: 12px 20px; font-size: 16px; font-weight: bold; border-radius: 4px; cursor: pointer; width: 100%; }
+        .btn-submit:hover { background-color: #cca300; }
+        
+        /* أدوات الترتيب والبحث */
+        .controls-section { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 20px; }
+        .search-box { background-color: #1e1e1e; border: 1px solid #333; padding: 8px 15px; border-radius: 4px; color: #fff; width: 250px; outline: none; }
+        .search-box:focus { border-color: #ffcc00; }
+        .sort-buttons button { background-color: #2a2a2a; color: #ffcc00; border: 1px solid #444; padding: 8px 16px; margin-right: 5px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .sort-buttons button:hover, .sort-buttons button.active { background-color: #ffcc00; color: #121212; border-color: #ffcc00; }
+        
+        /* تصميم الجدول */
+        .table-container { background-color: #1e1e1e; border: 1px solid #333; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        table { width: 100%; border-collapse: collapse; text-align: right; }
+        th, td { padding: 14px 20px; border-bottom: 1px solid #333; }
+        th { background-color: #252525; color: #ffcc00; }
+        tr:nth-child(even) { background-color: #161616; }
+        tr:hover { background-color: #252525; }
+        
+        /* التنبيهات */
+        .status-message { padding: 12px; border-radius: 4px; margin-bottom: 15px; display: none; font-weight: bold; text-align: center; }
+        .success { background-color: #1b4332; color: #75e6da; border: 1px solid #2d6a4f; }
+        .error { background-color: #660708; color: #f25c54; border: 1px solid #a4161a; }
+        .loading { text-align: center; padding: 20px; font-size: 18px; color: #ffcc00; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>لوحة تحكم وترتيب القلاع - انتقام السلاطين</h1>
+    
+    <div class="form-section">
+        <h3>إضافة قلعة جديدة أو تحديث بياناتك</h3>
+        <div id="status-msg" class="status-message"></div>
+        <form id="castle-form">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="uid">رقم الـ UID (ثابت ولا يتكرر)</label>
+                    <input type="text" id="uid" required placeholder="مثال: 1025448">
+                </div>
+                <div class="form-group">
+                    <label for="name">اسم القلعة / اللاعب</label>
+                    <input type="text" id="name" required placeholder="ادخل الاسم في اللعبة">
+                </div>
+                <div class="form-group">
+                    <label for="fiend_level">مستوى المارد</label>
+                    <input type="number" id="fiend_level" min="0" required placeholder="مثال: 5">
+                </div>
+                <div class="form-group">
+                    <label for="fire_stones">كمية حجر اللهب</label>
+                    <input type="number" id="fire_stones" min="0" required placeholder="مثال: 2500">
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">حفظ وتحديث البيانات فوراً 💾</button>
+        </form>
+    </div>
+
+    <div class="controls-section">
+        <div class="sort-buttons">
+            <span>الترتيب حسب: </span>
+            <button id="sort-fiend" onclick="setSort('fiend_level')">المارد ⇅</button>
+            <button id="sort-stones" onclick="setSort('fire_stones')">حجر اللهب ⇅</button>
+        </div>
+        <input type="text" id="search-input" class="search-box" placeholder="ابحث عن لاعب أو UID..." oninput="handleSearch()">
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>UID القلعة</th>
+                    <th>اسم القلعة</th>
+                    <th>لفل المارد</th>
+                    <th>كمية حجر اللهب</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+                <tr>
+                    <td colspan="4" class="loading">جاري تحميل قلاع التحالف...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // تم ربط قاعدة البيانات الخاصة بك هنا بنجاح
+    const SUPABASE_URL = 'https://curpvegrphkynhcuhutt.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1cnB2ZWdycGhreW5oY3VodXR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNDcyNjksImV4cCI6MjA5NDcyMzI2OX0.lUxmI4LraJu9bUgoX7IzrWp4HOJhgTuywFOPIh9eWj4';
+    
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let castlesData = [];
+    let currentSortKey = 'fire_stones'; // الترتيب الافتراضي حسب حجر اللهب
+    let isAscending = false; // من الأعلى للأقل
+
+    // 1. جلب البيانات من قاعدة البيانات فور فتح الموقع
+    async function fetchCastles() {
+        try {
+            const { data, error } = await supabase.from('castles').select('*');
+            if (error) throw error;
+            castlesData = data || [];
+            applySortAndRender();
+        } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('table-body').innerHTML = `<tr><td colspan="4" class="error" style="text-align:center;">خطأ في الاتصال بقاعدة البيانات. تأكد من إغلاق نظام الـ RLS في Supabase.</td></tr>`;
+        }
+    }
+
+    // 2. بناء وعرض الجدول
+    function renderTable(data) {
+        const tbody = document.getElementById('table-body');
+        if (data.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px; color: #888;">لا توجد قلاع مسجلة حالياً.</td></tr>`;
+            return;
+        }
+        tbody.innerHTML = '';
+        data.forEach(castle => {
+            tbody.innerHTML += `<tr>
+                <td style="font-family: monospace; font-size: 15px; color: #ffcc00;">${castle.uid}</td>
+                <td>${escapeHtml(castle.name)}</td>
+                <td>${castle.fiend_level}</td>
+                <td>${Number(castle.fire_stones).toLocaleString()}</td>
+            </tr>`;
+        });
+    }
+
+    // 3. الحفظ الذكي (إدخال جديد أو تحديث السجل الحالي إذا تطابق الـ UID)
+    document.getElementById('castle-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        showStatus('', '');
+        
+        const uid = document.getElementById('uid').value.trim();
+        const name = document.getElementById('name').value.trim();
+        const fiend_level = parseInt(document.getElementById('fiend_level').value);
+        const fire_stones = parseInt(document.getElementById('fire_stones').value);
+
+        try {
+            // كود الـ upsert يضمن عدم تكرار الـ UID ويقوم بالتحديث التلقائي
+            const { error } = await supabase
+                .from('castles')
+                .upsert({ uid, name, fiend_level, fire_stones }, { onConflict: 'uid' });
+
+            if (error) throw error;
+
+            showStatus('تم حفظ وتحديث بيانات قلعتك بنجاح! ✨', 'success');
+            document.getElementById('castle-form').reset();
+            fetchCastles(); // تحديث الجدول فوراً للجميع
+        } catch (error) {
+            showStatus('حدث خطأ أثناء الحفظ: ' + error.message, 'error');
+        }
+    });
+
+    // 4. محرك الفرز والترتيب والبحث
+    function setSort(key) {
+        if (currentSortKey === key) { isAscending = !isAscending; } 
+        else { currentSortKey = key; isAscending = false; }
+        document.getElementById('sort-fiend').classList.toggle('active', currentSortKey === 'fiend_level');
+        document.getElementById('sort-stones').classList.toggle('active', currentSortKey === 'fire_stones');
+        applySortAndRender();
+    }
+
+    function applySortAndRender() {
+        let filtered = castlesData.filter(item => {
+            const query = document.getElementById('search-input').value.toLowerCase().trim();
+            return !query || item.uid.toLowerCase().includes(query) || item.name.toLowerCase().includes(query);
+        });
+        
+        filtered.sort((a, b) => {
+            return isAscending ? Number(a[currentSortKey]) - Number(b[currentSortKey]) : Number(b[currentSortKey]) - Number(a[currentSortKey]);
+        });
+        renderTable(filtered);
+    }
+
+    function handleSearch() { applySortAndRender(); }
+    function showStatus(text, type) {
+        const msgDiv = document.getElementById('status-msg');
+        if (!text) { msgDiv.style.display = 'none'; return; }
+        msgDiv.className = `status-message ${type}`; msgDiv.innerText = text; msgDiv.style.display = 'block';
+    }
+    function escapeHtml(str) { return String(str).replace(/[&<>"']/g, s => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[s])); }
+
+    window.onload = () => { document.getElementById('sort-stones').classList.add('active'); fetchCastles(); };
+</script>
+</body>
+</html>
