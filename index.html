@@ -17,7 +17,7 @@
         .container { max-width: 1000px; margin: 0 auto; }
         h1 { text-align: center; color: #ffcc00; text-shadow: 0 2px 4px rgba(0,0,0,0.5); margin-bottom: 30px; }
         
-        /* تصميم فوروم الإدخال */
+        /* تصميم فورم الإدخال */
         .form-section {
             background-color: #1e1e1e;
             border: 1px solid #333;
@@ -84,7 +84,7 @@
                     <input type="number" id="fire_stones" min="0" required placeholder="مثال: 2500">
                 </div>
             </div>
-            <button type="submit" class="btn-submit">حفظ وتحديث البيانات فوراً 💾</button>
+            <button type="submit" id="submit-btn" class="btn-submit">حفظ وتحديث البيانات فوراً 💾</button>
         </form>
     </div>
 
@@ -117,34 +117,40 @@
 </div>
 
 <script>
-    // تم ربط الرابط والمفتاح الجديد بنجاح هنا
+    // الإعدادات الرسمية والمحدثة الخاصة بمشروعك
     const SUPABASE_URL = 'https://curpvegrphkynhcuhutt.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable__5-enbz-110Fx_LM2SOf-Q_omDwTiEx';
     
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // إنشاء الاتصال بقاعدة البيانات مع فحص الأخطاء
+    let supabaseClient;
+    try {
+        supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    } catch (e) {
+        alert("خطأ كارثي في تهيئة مكتبة السيرفر: " + e.message);
+    }
 
     let castlesData = [];
-    let currentSortKey = 'fire_stones'; // الترتيب الافتراضي حسب حجر اللهب
-    let isAscending = false; // من الأعلى للأقل
+    let currentSortKey = 'fire_stones'; 
+    let isAscending = false; 
 
-    // 1. جلب البيانات من قاعدة البيانات فور فتح الموقع
+    // 1. دالة جلب البيانات من السيرفر وعرضها
     async function fetchCastles() {
         try {
-            const { data, error } = await supabase.from('castles').select('*');
+            const { data, error } = await supabaseClient.from('castles').select('*');
             if (error) throw error;
             castlesData = data || [];
             applySortAndRender();
         } catch (error) {
-            console.error('Error:', error);
-            document.getElementById('table-body').innerHTML = `<tr><td colspan="4" class="error" style="text-align:center;">خطأ في الاتصال بقاعدة البيانات. تأكد من إغلاق نظام الـ RLS في Supabase.</td></tr>`;
+            console.error('Error fetching:', error);
+            document.getElementById('table-body').innerHTML = `<tr><td colspan="4" class="error" style="text-align:center;">فشل الاتصال بالسيرفر أو جلب القلاع.</td></tr>`;
         }
     }
 
-    // 2. بناء وعرض الجدول
+    // 2. بناء الجدول في الصفحة
     function renderTable(data) {
         const tbody = document.getElementById('table-body');
         if (data.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px; color: #888;">لا توجد قلاع مسجلة حالياً.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px; color: #888;">لا توجد قلاع مسجلة حالياً بالتحالف.</td></tr>`;
             return;
         }
         tbody.innerHTML = '';
@@ -158,33 +164,52 @@
         });
     }
 
-    // 3. الحفظ الذكي (إدخال جديد أو تحديث السجل الحالي إذا تطابق الـ UID)
-    document.getElementById('castle-form').addEventListener('submit', async (e) => {
+    // 3. دالة معالجة وحفظ البيانات عند ضغط الزر
+    document.getElementById('castle-form').addEventListener('submit', async function(e) {
         e.preventDefault();
-        showStatus('', '');
         
-        const uid = document.getElementById('uid').value.trim();
-        const name = document.getElementById('name').value.trim();
-        const fiend_level = parseInt(document.getElementById('fiend_level').value);
-        const fire_stones = parseInt(document.getElementById('fire_stones').value);
+        // تغيير حالة الزر لمنع الضغط المتكرر
+        const submitBtn = document.getElementById('submit-btn');
+        submitBtn.disabled = true;
+        submitBtn.innerText = "جاري الحفظ والاتصال بالسيرفر... ⏳";
+        showStatus('جاري إرسال البيانات لقاعدة البيانات...', 'success');
+        
+        const uidValue = document.getElementById('uid').value.trim();
+        const nameValue = document.getElementById('name').value.trim();
+        const fiendValue = parseInt(document.getElementById('fiend_level').value);
+        const stonesValue = parseInt(document.getElementById('fire_stones').value);
 
         try {
-            // كود الـ upsert يضمن عدم تكرار الـ UID ويقوم بالتحديث التلقائي
-            const { error } = await supabase
+            // إرسال البيانات للجدول
+            const { error } = await supabaseClient
                 .from('castles')
-                .upsert({ uid, name, fiend_level, fire_stones }, { onConflict: 'uid' });
+                .upsert({ 
+                    uid: uidValue, 
+                    name: nameValue, 
+                    fiend_level: fiendValue, 
+                    fire_stones: stonesValue 
+                }, { onConflict: 'uid' });
 
             if (error) throw error;
 
+            // إذا نجح الحفظ
             showStatus('تم حفظ وتحديث بيانات قلعتك بنجاح! ✨', 'success');
+            alert('🎉 تم الحفظ بنجاح وتحديث اللوحة للتحالف!');
             document.getElementById('castle-form').reset();
-            fetchCastles(); // تحديث الجدول فوراً للجميع
+            await fetchCastles(); // تحديث الجدول فوراً
+            
         } catch (error) {
+            // إذا فشل الحفظ، يطبع التنبيه فوراً للمستخدم لمعرفة السبب
             showStatus('حدث خطأ أثناء الحفظ: ' + error.message, 'error');
+            alert('❌ فشل الحفظ بالسيرفر!\nالسبب الرئيسي: ' + error.message + '\n\n(تأكد من إغلاق RLS في Supabase أو مطابقة أسماء الأعمدة)');
+        } finally {
+            // إعادة الزر لوضعه الطبيعي
+            submitBtn.disabled = false;
+            submitBtn.innerText = "حفظ وتحديث البيانات فوراً 💾";
         }
     });
 
-    // 4. محرك الفرز والترتيب والبحث
+    // 4. محرك الفرز والترتيب والبحث والفلترة
     function setSort(key) {
         if (currentSortKey === key) { isAscending = !isAscending; } 
         else { currentSortKey = key; isAscending = false; }
@@ -196,7 +221,7 @@
     function applySortAndRender() {
         let filtered = castlesData.filter(item => {
             const query = document.getElementById('search-input').value.toLowerCase().trim();
-            return !query || item.uid.toLowerCase().includes(query) || item.name.toLowerCase().includes(query);
+            return !query || String(item.uid).toLowerCase().includes(query) || item.name.toLowerCase().includes(query);
         });
         
         filtered.sort((a, b) => {
@@ -213,7 +238,11 @@
     }
     function escapeHtml(str) { return String(str).replace(/[&<>"']/g, s => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[s])); }
 
-    window.onload = () => { document.getElementById('sort-stones').classList.add('active'); fetchCastles(); };
+    // تشغيل جلب البيانات تلقائياً عند فتح الصفحة
+    window.onload = () => { 
+        document.getElementById('sort-stones').classList.add('active'); 
+        fetchCastles(); 
+    };
 </script>
 </body>
 </html>
