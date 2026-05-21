@@ -42,4 +42,160 @@
 <body>
 
 <div class="container">
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAACmCAMAAADf80DFAAAAAklEQVR4AewaftIAAADnUExURQf/AP8AAP8AAACZAP/MZv///8zM/8zMzJnMzP+ZzP+Zmcz/Zv//mWb//5nMzADMAJmZmWZmZgBmADMzMwAzMzMAmZnMZgDMmWZmZjPMzADMzGbMmf+ZmWbM/8z//5n/mf+ZmZnMmWbMmf//zGb/mWb/mZnM/2ZmMwBmZjPMzMz/mf//zP+ZmWb/zAD//2ZmM2aZmf///5nMmWbMZv+Z/8yZmWaZmcyZmWbM/8yZmZmZmcyZmczMzGbMmZmZmf+ZmczMZsyZmZmZmZnMzMyZmZmZmczMzAD//3e4E/oAAAAJcEhZcwAACxMAAAsTAQCanBgAAAd5SURBVHic7ZvdctowEIVtB9vYgG0wMcT8pEnTpt33f1G7m8bQpEn6YofInDOzM6vVRpYez0g7K8vLpCgK/g/k9Zshf0A9W6pny9VsqZ4tV7OleuZQPVP+OetYgT73Olagz72OFenzuK8gP6A+j/sK8gPq87ivID+gPo/7CvID6vO4ryA/oD6P+wryA6pny9VsqZ4tV7OleuZQPVP+OetYgT73Olagz71WpBeP+fE+D9f9vOfH90z+y6E+qC8R6kvOes7wM6U+D9ep6vOUPo/p89S9p899enGfH+9zvD69eK8P6guE+hK9OOfwPtf7XPr0ecb79N3rYh3b9r0u3utT/nIu3ue8h+/5zH36PP0+fZ7R5wP1+fE+x+uL93nWp67PM97rK/f5+I7D+xyuL/98+u7T+wO3F26vU6v05fU6tfbpdTo1fX7FvY736XteX/U+79eH99fv85L6gO/5vO5Yre+e61id71it71it73etYyWv9/vXsfT6bO79gXXS79Xre1O/16/Wp97rdT33Ona9PrO+PZt7fWDvL6W++fG93++X1BfqpXqpXv8Eer2S6qV6qV7/BHq9kuqleurq2XIn9Uz556xnE+9YFffp658D9bniHrt7ffK6u9cnU9fqZ+ve8t80YyWvK96xO96xTveWzL0lc2/J3Fsy95bMvSVzb8ncW9K9JXNvyX9M90bco/6j+gZ6uXqp/0PPljupXur/0LPlTqqX+j/0bLmT6qX+D8u93K8pS13M/Zqy1G7N/ZqyfLp7fS/MvXN9L0Zdp69fUpb6L/f8P/X5Yq9/6r/c86Uu9flijPpc9V/G9FmX+lyN7l7fpGfvL8Y69l96vYFfDNTN6zN3b+Znr8/6Z/u8gV9oT0XdtH6hveqeq7vXN7t7Y+/ezBf6XN1f6HPZ3Zvf6wt9vunujXyxZ3ffyM9eX8wXe0vWe0u9t9R7S7231HtLvbfUe0u9t9R7S7239Ifv/eWf9/5Cez7v/YWvL/f15X69r6/u6/v09et9feWe/6feX7m379zbd+6f/pSydE+mPlV37qnep+oV9Xnqn8pUf9X7NGe9zZf69GlMn1/6PqfVp/p76p9en+6u3F3qD8XduX96L9WfWf/pUv0ldevpMv+Z6e/q+1S9z9yn6vPUn1m9Y8vd3fO9u/f7VvR99Xg/9fX14/3U9/qR9by/f6eO1Xv+2F8S/b079ZfN/v6dMfeXWfeXzV6fdb9v9vVZd+/+gL3fR+/v2/v7vVbve3fv/fL2vXs79PbtvG76961v6n2vXl97fW3vdb6vW++Vvfe60m96fdfru
+    <img src="https://images.imgbox.com/ca/f2/T2nKizZt_o.png" alt="القيادة العامة 92" class="calc-logo">
+
+    <h1>🔥 حاسبة المارد (201 - 450)</h1>
+
+    <div class="input-card">
+        <div class="input-group">
+            <label>المستوى الحالي:</label>
+            <input type="number" id="currentLvl" placeholder="من 201">
+        </div>
+        <div class="input-group">
+            <label>المستوى المطلوب:</label>
+            <input type="number" id="targetLvl" placeholder="إلى 450">
+        </div>
+        <div class="input-group">
+            <label>نسبة الخصم:</label>
+            <select id="discount">
+                <option value="0">بدون خصم (0%)</option>
+                <option value="10">خصم 10%</option>
+                <option value="15">خصم 15%</option>
+                <option value="20">خصم 20% (من لفل 351 إلى 450 فقط)</option>
+                <option value="30">خصم 30%</option>
+            </select>
+        </div>
+    </div>
+
+    <button class="btn" onclick="calculate()">احسب التكلفة</button>
+
+    <div id="result-box" class="results">
+        <div class="res-line">
+            <span>تكلفة اللفلات العادية:</span>
+            <span id="lvlOnly">0</span>
+        </div>
+        <div class="res-line" style="flex-direction: column; align-items: flex-start;">
+            <div style="display: flex; justify-content: space-between; width: 100%;">
+                <span>تكلفة الحفر:</span>
+                <span id="hufraOnly">0</span>
+            </div>
+            <div id="hufraLog" class="hufra-list"></div>
+        </div>
+        <div class="res-line" id="discLine">
+            <span>الخصم:</span>
+            <span id="discAmount">0</span>
+        </div>
+        <div style="text-align: center; margin-top: 15px;">
+            <span style="color: #aaa; font-size: 0.8rem;">المجموع النهائي:</span>
+            <span class="total-val" id="totalRes">0</span>
+        </div>
+    </div>
+    
+    <div class="footer">برمجة وتنفيذ الشيخ اعدام 92</div>
+
+    <div class="nav-tabs">
+        <a href="#" class="tab-link active">حاسبة المارد</a>
+        <a href="https://mngm2009-ui.github.io/Najm2/" class="tab-link">حاسبة العنصر</a>
+        <a href="https://mngm2009-ui.github.io/Najm/" class="tab-link">حاسبة الاختام</a>
+    </div>
+</div>
+
+<script>
+    function calculate() {
+        const current = parseInt(document.getElementById('currentLvl').value);
+        const target = parseInt(document.getElementById('targetLvl').value);
+        const disc = parseFloat(document.getElementById('discount').value);
+
+        if (isNaN(current) || isNaN(target) || current < 201 || target > 450 || current >= target) {
+            alert("يرجى إدخال مستويات صحيحة (201-450)");
+            return;
+        }
+
+        const blackData = {
+            201:480, 202:530, 203:580, 204:630, 205:680, 206:730, 207:780, 208:830, 209:880, 210:930,
+            211:560, 212:610, 213:660, 214:710, 215:760, 216:810, 217:860, 218:910, 219:960, 220:1010,
+            221:640, 222:690, 223:740, 224:790, 225:840, 226:890, 227:940, 228:990, 229:1040, 230:1090,
+            231:720, 232:770, 233:820, 234:870, 235:920, 236:970, 237:1020, 238:1070, 239:1120, 240:1170,
+            241:800, 242:850, 243:900, 244:950, 245:1000, 246:1050, 247:1100, 248:1150, 249:1200, 250:1250,
+            251:600, 252:660, 253:720, 254:780, 255:840, 256:900, 257:960, 258:1020, 259:1080, 260:1140,
+            261:650, 262:710, 263:770, 264:830, 265:890, 266:950, 267:1010, 268:1070, 269:1130, 270:1190,
+            271:700, 272:760, 273:820, 274:880, 275:940, 276:1000, 277:1060, 278:1120, 279:1180, 280:1240,
+            281:750, 282:810, 283:870, 284:930, 285:990, 286:1050, 287:1110, 288:1170, 289:1230, 290:1290,
+            291:800, 292:860, 293:920, 294:980, 295:1040, 296:1100, 297:1160, 298:1220, 299:1280, 300:1340,
+            301:800, 302:860, 303:920, 304:980, 305:1040, 306:1100, 307:1160, 308:1220, 309:1280, 310:1340,
+            311:650, 312:710, 313:770, 314:830, 315:890, 316:950, 317:1010, 318:1070, 319:1130, 320:1190,
+            321:700, 322:760, 323:820, 324:880, 325:940, 326:1000, 327:1060, 328:1120, 329:1180, 330:1240,
+            331:750, 332:810, 333:870, 334:930, 335:990, 336:1050, 337:1110, 338:1170, 339:1230, 340:1290,
+            341:800, 342:860, 343:920, 344:980, 345:1040, 346:1100, 347:1160, 348:1220, 349:1280, 350:1340,
+            351:800, 352:860, 353:920, 354:980, 355:1040, 356:1100, 357:1160, 358:1220, 359:1280, 360:1340,
+            361:800, 362:860, 363:920, 364:980, 365:1040, 366:1100, 367:1160, 368:1220, 369:1280, 370:1340,
+            371:800, 372:860, 373:920, 374:980, 375:1040, 376:1100, 377:1160, 378:1220, 379:1280, 380:1340,
+            381:1080, 382:1180, 383:1280, 384:1380, 385:1480, 386:1580, 387:1680, 388:1780, 389:1880, 390:1980,
+            391:1160, 392:1280, 393:1400, 394:1520, 395:1640, 396:1760, 397:1880, 398:2000, 399:2120, 400:2240,
+            401:1390, 402:1530, 403:1670, 404:1810, 405:1950, 406:2090, 407:2230, 408:2370, 409:2510, 410:2650,
+            411:1670, 412:1830, 413:1990, 414:2150, 415:2310, 416:2470, 417:2630, 418:2790, 419:2950, 420:3110,
+            421:1830, 422:1990, 423:2150, 424:2310, 425:2470, 426:2630, 427:2790, 428:2950, 429:3110, 430:3270,
+            431:1670, 432:1830, 433:1990, 434:2150, 435:2310, 436:2470, 437:2630, 438:2790, 439:2950, 440:3110,
+            441:1670, 442:1830, 443:1990, 444:2150, 445:2310, 446:2470, 447:2630, 448:2790, 449:2950, 450:3110
+        };
+
+        const hufraData = {
+            210: 7000, 220: 7000, 230: 7400, 240: 7700, 250: 12000,
+            260: 8000, 270: 8000, 280: 8000, 290: 9300, 300: 14400,
+            310: 10000, 320: 8000, 330: 8000, 340: 9300, 350: 16000,
+            360: 10000, 370: 9000, 380: 11000, 390: 12000, 400: 16000,
+            410: 14000, 420: 16000, 430: 19000, 440: 22000
+        };
+
+        let totalBlack = 0;
+        let totalHufra = 0;
+        let discountableAmount = 0; 
+        let logs = [];
+
+        for (let i = current + 1; i <= target; i++) {
+            let currentLvlCost = 0;
+            
+            if (blackData[i]) {
+                totalBlack += blackData[i];
+                currentLvlCost += blackData[i];
+            }
+            if (hufraData[i]) {
+                totalHufra += hufraData[i];
+                currentLvlCost += hufraData[i];
+                logs.push("حفرة لفل " + i + " (" + hufraData[i].toLocaleString() + ")");
+            }
+
+            if (disc === 20) {
+                if (i >= 351 && i <= 450) {
+                    discountableAmount += currentLvlCost;
+                }
+            }
+        }
+
+        let discVal = 0;
+        if (disc === 20) {
+            discVal = discountableAmount * (20 / 100);
+        } else {
+            discVal = (totalBlack + totalHufra) * (disc / 100);
+        }
+
+        const combined = totalBlack + totalHufra;
+        const final = combined - discVal;
+
+        document.getElementById('result-box').style.display = "block";
+        document.getElementById('lvlOnly').innerText = totalBlack.toLocaleString();
+        document.getElementById('hufraOnly').innerText = totalHufra.toLocaleString();
+        document.getElementById('discAmount').innerText = "-" + Math.floor(discVal).toLocaleString();
+        document.getElementById('totalRes').innerText = Math.floor(final).toLocaleString();
+        
+        const logBox = document.getElementById('hufraLog');
+        if (logs.length > 0) {
+            logBox.style.display = "block";
+            logBox.innerHTML = "<strong>الحفر المشمولة:</strong><br>" + logs.join("<br>");
+        } else {
+            logBox.style.display = "none";
+        }
+    }
+</script>
+</body>
+</html>
